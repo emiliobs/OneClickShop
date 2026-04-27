@@ -1,11 +1,12 @@
 package com.emilio.oneclickshop.data.repository
 
+import android.util.Log
 import com.emilio.oneclickshop.data.local.CartDao
 import com.emilio.oneclickshop.data.model.CartItem
 import kotlinx.coroutines.flow.Flow
 
 /**
- * CartRepository is the single source of truth for cart data.
+ * 📦 CartRepository is the single source of truth for cart data.
  * The ViewModel talks to this repository — never directly to the DAO.
  * This keeps our code clean and easy to test.
  *
@@ -15,46 +16,81 @@ import kotlinx.coroutines.flow.Flow
 class CartRepository(private val cartDao: CartDao) {
 
     /**
-     * Exposes all cart items as a Flow.
+     * 🌊 Exposes all cart items as a Flow.
      * The Cart screen observes this — any change updates the UI instantly.
      */
     val allCartItems: Flow<List<CartItem>> = cartDao.getAllCartItems()
 
     /**
-     * Adds a product to the cart.
+     * ➕ Adds a product to the cart safely.
      * If the product is already in the cart, increases its quantity instead.
      * This prevents duplicate entries for the same product.
      */
     suspend fun addToCart(cartItem: CartItem) {
-        val existing = cartDao.getCartItemByProductId(cartItem.productId)
-        if (existing != null) {
-            // Product already in cart — just increase the quantity
-            cartDao.updateCartItem(existing.copy(quantity = existing.quantity + 1))
-        } else {
-            // New product — insert it fresh
-            cartDao.insertCartItem(cartItem)
+        try
+        {
+            val existing = cartDao.getCartItemByProductId(cartItem.productId)
+            if (existing != null)
+            {
+                // Product already in cart — just increase the quantity
+                cartDao.updateCartItem(existing.copy(quantity = existing.quantity + 1))
+            }
+            else
+            {
+                // New product — insert it fresh
+                cartDao.insertCartItem(cartItem)
+            }
+        }
+        catch (e: Exception)
+        {
+            // 🛡️ Safely catch any database insertion errors
+            Log.e("CartRepository", "Error adding to cart: ${e.message}")
         }
     }
 
     /**
-     * Updates an existing cart item (e.g. changing quantity).
+     * 🔄 Updates an existing cart item safely (e.g. changing quantity).
      */
     suspend fun updateCartItem(cartItem: CartItem) {
-        cartDao.updateCartItem(cartItem)
+        try
+        {
+            cartDao.updateCartItem(cartItem)
+        }
+        catch (e: Exception)
+        {
+            // 🛡️ Safely catch any database update errors
+            Log.e("CartRepository", "Error updating cart item: ${e.message}")
+        }
     }
 
     /**
-     * Removes one item from the cart.
+     * ❌ Removes one item from the cart safely.
      */
     suspend fun removeFromCart(cartItem: CartItem) {
-        cartDao.deleteCartItem(cartItem)
+        try
+        {
+            cartDao.deleteCartItem(cartItem)
+        }
+        catch (e: Exception)
+        {
+            // 🛡️ Safely catch any database deletion errors
+            Log.e("CartRepository", "Error removing from cart: ${e.message}")
+        }
     }
 
     /**
-     * Empties the entire cart.
+     * 🧹 Empties the entire cart safely.
      * Called after a successful checkout.
      */
     suspend fun clearCart() {
-        cartDao.clearCart()
+        try
+        {
+            cartDao.clearCart()
+        }
+        catch (e: Exception)
+        {
+            // 🛡️ Safely catch any database clear errors
+            Log.e("CartRepository", "Error clearing cart: ${e.message}")
+        }
     }
 }
