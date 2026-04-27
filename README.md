@@ -3,7 +3,7 @@
 A native Android e-commerce application built with Kotlin and Jetpack Compose.
 Developed as coursework for **CS6051 - Mobile Applications** at London Metropolitan University.
 
-> **Student:** Emilio Antonio Barrera Sepúlveda · **ID:** 22047090 · **Academic Year:** 2025–2026
+> **Student:** Emilio Antonio Barrera Sepúlveda · **ID:** 22047055 · **Academic Year:** 2025–2026
 
 ---
 
